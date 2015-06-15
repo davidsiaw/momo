@@ -1,32 +1,34 @@
 require "momo/version"
 require 'aws-sdk-core'
 require 'yaml'
+require 'JSON'
 
-require "momo/momo_config"
-require "momo/momo_cloud"
-require "momo/momo_aws"
-require "momo/resource_types/all"
+require 'momo/cfl.rb'
+require 'momo/resource.rb'
+require 'momo/stack.rb'
 
-module Momo
-
+def cfl(&block)
+	Momo::CFL.new(&block)
 end
 
-def momo_create(&block)
-	cloud = Momo::MomoCloud.new(Momo::MomoConfig.new, &block)
-	cloud.create
-	cloud.structure
+def checkcfl(profile, region, template)
+
+	cf = Aws::CloudFormation::Client.new(
+		region: region, 
+		profile: profile)
+
+	cf.validate_template(template_body: template)
 end
 
-def momo_modify(structure, &block)
-	cloud = Momo::MomoCloud.new(Momo::MomoConfig.new, &block)
-	cloud.modify
-	cloud.structure
+def runcfl(profile, region, name, template)
+
+	cf = Aws::CloudFormation::Client.new(
+		region: region, 
+		profile: profile)
+
+	cf.create_stack(
+		stack_name: name,
+		template_body: template)
 end
 
-def momo_delete(structure)
-	cloud = Momo::MomoCloud.new Momo::MomoConfig.new do
-		_setstructure structure
-	end
-	cloud.delete
-	cloud.structure
-end
+

@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+require 'momo'
+require 'io/console'
+require 'fileutils'
+require 'pp'
+require 'trollop'
+require 'yaml'
+
+opts = Trollop::options do
+	version "momo v1.0 (c) 2015 Mobingi"
+	banner <<-ENDOFBANNER
+Usage:
+momo [options] template
+
+Options:
+  	ENDOFBANNER
+  	opt :name, "Name stack (only used when creating stack)", short: "n", default: "mystack"
+  	opt :display, "Display template JSON", short: "d"
+  	opt :create, "Create stack", short: "m"
+  	opt :check, "Run verification on template", short: "c"
+	opt :profile, "AWS credential profile to use", short: "p", default: "DEVELOPMENT"
+	opt :region, "AWS region to run your template", short: "r", default: "ap-northeast-1"
+end
+
+template = cfl do
+	#eval File.read(ARGV[0])
+
+	description "My docker layer"
+
+	haha = param type: :string, name: "Haha", default: "vpc"
+
+	eip = make "AWS::EC2::EIP" do
+		Domain haha
+	end
+
+	output "nyaa", eip
+end
+
+puts template.templatize() if opts[:display]
+
+if opts[:check]
+	res = checkcfl(opts[:profile], opts[:region], template.templatize()) 
+
+	res.parameters.each do |param|
+		puts "Parameter: #{param.parameter_key} Default: #{param.default_value} Desc: #{param.description}"
+	end
+end
+
+if opts[:create]
+	res = runcfl(opts[:profile], opts[:region], opts[:name], template.templatize()) 
+	puts "Created stack:"
+	puts res.stack_id
+end

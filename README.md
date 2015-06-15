@@ -1,6 +1,6 @@
 # Momo
 
-TODO: Write a gem description
+Cloudformation template builder
 
 ## Installation
 
