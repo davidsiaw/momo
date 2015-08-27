@@ -23,17 +23,7 @@ Options:
 end
 
 template = cfl do
-	#eval File.read(ARGV[0])
-
-	description "My docker layer"
-
-	haha = param type: :string, name: "Haha", default: "vpc"
-
-	eip = make "AWS::EC2::EIP" do
-		Domain haha
-	end
-
-	output "nyaa", eip
+	eval File.read(ARGV[0])
 end
 
 puts template.templatize() if opts[:display]
