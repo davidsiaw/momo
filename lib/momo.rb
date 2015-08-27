@@ -3,9 +3,14 @@ require 'aws-sdk-core'
 require 'yaml'
 require 'JSON'
 
-require 'momo/cfl.rb'
-require 'momo/resource.rb'
-require 'momo/stack.rb'
+require 'momo/cfl'
+require 'momo/reference'
+require 'momo/funccall'
+require 'momo/momoscope'
+require 'momo/parameter'
+require 'momo/resource'
+require 'momo/stack'
+
 
 def cfl(&block)
 	Momo::CFL.new(&block)

@@ -1,5 +1,9 @@
+require 'momo/momoscope'
+
 module Momo
-	class Stack
+	class Stack < MomoScope
+
+		attr_accessor :resources, :parameters, :outputs
 
 		def initialize(&block)
 			raise "Stack expects a block" unless block
@@ -8,6 +12,8 @@ module Momo
 			@resources = {}
 			@parameters = {}
 			@outputs = {}
+
+			@names = {}
 
 			@ids = {}
 			instance_eval(&block)
@@ -22,8 +28,20 @@ module Momo
 			end
 		end
 
-		def make_random_string
+		def make_default_resource_name (type)
+			match = /\:?\:?([a-zA-Z]+)$/.match(type)
+			name = match.captures[0]
 
+			if !@names[name]
+				@names[name] = 1
+			else
+				@names[name] += 1
+			end
+
+			"#{name}#{@names[name]}"
+		end
+
+		def make_random_string
 			id = ""
 			loop do 
 				o = [('A'..'Z'), ('0'..'9')].map { |i| i.to_a }.flatten
@@ -35,18 +53,17 @@ module Momo
 			id
 		end
 
-		def param(options)
-			@parameters[options[:name]] = options
-			options
+		def param(name, options={})
+			@parameters[name] = Parameter.new(name, options)
 		end
 
 		def make(type, options = {}, &block)
 
 			name = options[:name]
-			name = make_random_string if !name
+			name = make_default_resource_name(type) if !name
 
 			resource = Resource.new(type, name)
-			resource.instance_eval(&block)
+			resource.instance_eval(&block) if block
 
 			raise "Resource #{name} already exists" if @resources.has_key? resource.name
 			@resources[resource.name] = resource
@@ -71,6 +88,14 @@ module Momo
 				res.props.each do |propname, prop|
 					temp[name]["Properties"][propname] = prop
 				end
+
+				if res.metadata
+					temp[name]["Metadata"] = res.metadata
+				end
+
+				if res.dependencies.length != 0
+					temp[name]["DependsOn"] = res.dependencies
+				end
 			end
 			temp
 		end
@@ -92,8 +117,10 @@ module Momo
 					list: "List"
 				}
 
-				temp[name] = {"Type" => typeConv[param[:type]], "NoEcho" => true}
-				temp[name]["Default"] = param[:default] if param.has_key? :default
+				temp[name] = {"Type" => typeConv[param.options[:type]]}
+				temp[name]["NoEcho"] = true unless param.options[:no_echo] == false
+				temp[name]["Description"] = param.options[:description] if param.options.has_key? :description
+				temp[name]["Default"] = param.options[:default] if param.options.has_key? :default
 			end
 			temp
 		end

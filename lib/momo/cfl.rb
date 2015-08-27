@@ -12,11 +12,12 @@ module Momo
 			template["Description"] = @stack.description
 
 			template["Resources"] = @stack.templatize_resources
-			template["Parameters"] = @stack.templatize_params
-			template["Outputs"] = @stack.templatize_outputs
+			template["Parameters"] = @stack.templatize_params if @stack.parameters.length > 0
+			template["Outputs"] = @stack.templatize_outputs if @stack.outputs.length > 0
 
 			template.to_json
 		end
 
+		
 	end
 end
