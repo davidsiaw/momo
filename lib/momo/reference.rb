@@ -8,5 +8,9 @@ module Momo
 		def representation
 			{"Ref" => @res}
 		end
+
+		def method_missing(name, *args, &block)
+			puts "Ref missing #{name}"
+		end
 	end
 end

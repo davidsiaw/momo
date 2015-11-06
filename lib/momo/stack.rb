@@ -64,6 +64,7 @@ module Momo
 
 			resource = Resource.new(type, name)
 			resource.instance_eval(&block) if block
+			resource.complete!
 
 			raise "Resource #{name} already exists" if @resources.has_key? resource.name
 			@resources[resource.name] = resource

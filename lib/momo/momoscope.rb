@@ -1,8 +1,8 @@
 
 module Momo
 
-	def Momo.resolve(something)
-
+	def Momo.resolve(something, options={})
+		
 		if something.is_a? String or 
 			something.is_a? TrueClass or 
 			something.is_a? FalseClass or
@@ -29,7 +29,7 @@ module Momo
 		elsif something.is_a? Parameter
 			return { "Ref" => something.name }
 		else
-			raise "Invalid var: #{something}"
+			raise "Invalid var: '#{something}' in #{options[:resource]}"
 		end
 	end
 	

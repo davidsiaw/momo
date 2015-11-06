@@ -10,6 +10,7 @@ module Momo
 			@metadata = nil
 			@props = {}
 			@dependencies = []
+			@complete = false
 		end
 
 		def method_missing(name, *args, &block)
@@ -18,7 +19,15 @@ module Momo
 				raise "Invalid resource name: #{name}"
 			end
 
-			@props[name] = Momo.resolve(args[0])
+			if !@complete
+				@props[name] = Momo.resolve(args[0], resource: name)
+			else
+				FuncCall.new "Fn::GetAtt", "#{@name}", "#{name}"
+			end
+		end
+
+		def complete!
+			@complete = true
 		end
 
 		def init_metadata!
