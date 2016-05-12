@@ -1,6 +1,33 @@
 require 'momo/momoscope'
 
 module Momo
+
+	class MappingRow < MomoScope
+		attr_accessor :values
+
+		def initialize(&block)
+			@values = {}
+			instance_eval(&block)
+		end
+
+		def item(name, value)
+			@values[name] = value
+		end
+	end
+
+	class Mapping < MomoScope
+		attr_accessor :major_keys
+
+		def initialize(&block)
+			@major_keys = {}
+			instance_eval(&block)
+		end
+
+		def key(name, &block)
+			@major_keys[name] = MappingRow.new(&block).values
+		end
+	end
+
 	class Stack < MomoScope
 
 		attr_accessor :resources, :parameters, :outputs
@@ -12,6 +39,7 @@ module Momo
 			@resources = {}
 			@parameters = {}
 			@outputs = {}
+			@mappings = {}
 
 			@names = {}
 
@@ -81,6 +109,13 @@ module Momo
 			end
 		end
 
+		def mapping(name, &block)
+			@mappings[name] = Mapping.new(&block).major_keys
+		end
+
+		def templatize_mappings
+			@mappings
+		end
 
 		def templatize_resources
 			temp = {}
@@ -122,6 +157,7 @@ module Momo
 				temp[name]["NoEcho"] = true unless param.options[:no_echo] == false
 				temp[name]["Description"] = param.options[:description] if param.options.has_key? :description
 				temp[name]["Default"] = param.options[:default] if param.options.has_key? :default
+				temp[name]["AllowedValues"] = param.options[:allowed] if param.options.has_key? :allowed
 			end
 			temp
 		end

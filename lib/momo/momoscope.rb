@@ -42,5 +42,9 @@ module Momo
 		def ref(resource)
 			Reference.new(resource)
 		end
+
+		def lookup(map_name, key, item)
+			call("Fn::FindInMap", map_name, key, item)
+		end
 	end
 end
