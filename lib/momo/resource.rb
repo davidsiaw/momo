@@ -2,7 +2,7 @@ module Momo
 
 	class Resource < MomoScope
 
-		attr_accessor :type, :name, :props, :metadata, :dependencies
+		attr_accessor :type, :name, :props, :metadata, :dependencies, :deletion_policy
 
 		def initialize(type, name)
 			@type = type
@@ -11,6 +11,7 @@ module Momo
 			@props = {}
 			@dependencies = []
 			@complete = false
+			@deletion_policy = nil
 		end
 
 		def method_missing(name, *args, &block)
@@ -24,6 +25,10 @@ module Momo
 			else
 				FuncCall.new "Fn::GetAtt", "#{@name}", "#{name}"
 			end
+		end
+		
+		def set_deletion_policy(value)
+			@deletion_policy = value
 		end
 
 		def complete!

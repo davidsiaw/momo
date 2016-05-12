@@ -132,6 +132,10 @@ module Momo
 				if res.dependencies.length != 0
 					temp[name]["DependsOn"] = res.dependencies
 				end
+				
+				if res.deletion_policy
+					temp[name]["DeletionPolicy"] = res.deletion_policy
+				end
 			end
 			temp
 		end
