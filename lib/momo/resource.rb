@@ -117,7 +117,12 @@ module Momo
 				"context" => {},
 			}
 
+			if options[:content] and options[:source]
+				raise "Momo CFL Resource: Please specify only file content or source and not both"
+			end
+
 			info["content"] = options[:content] if options[:content]
+			info["source"] = options[:source] if options[:source]
 			info["group"] = options[:group] if options[:group]
 			info["mode"] = options[:mode] if options[:mode]
 			info["owner"] = options[:owner] if options[:owner]

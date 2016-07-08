@@ -7,7 +7,7 @@ require 'trollop'
 require 'yaml'
 
 opts = Trollop::options do
-	version "momo v1.0 (c) 2015 Mobingi"
+	version "momo v1.0 (c) David Siaw"
 	banner <<-ENDOFBANNER
 Usage:
 momo [options] template
