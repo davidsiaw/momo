@@ -9,6 +9,7 @@ require 'momo/funccall'
 require 'momo/momoscope'
 require 'momo/parameter'
 require 'momo/resource'
+require 'momo/mapping'
 require 'momo/stack'
 
 
