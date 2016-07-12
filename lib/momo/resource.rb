@@ -23,7 +23,7 @@ module Momo
 			if !@complete
 				@props[name] = Momo.resolve(args[0], resource: name)
 			else
-				FuncCall.new "Fn::GetAtt", "#{@name}", "#{name}"
+				MemberReference.new @name, name
 			end
 		end
 		
