@@ -21,6 +21,10 @@ module Momo
 			instance_eval(&block)
 		end
 
+		def inject(module_object=nil, &block)
+			extend module_object if module_object
+			instance_eval &block if block
+		end
 
 		def description(*args)
 			if (args.length == 1)
