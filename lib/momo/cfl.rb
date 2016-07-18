@@ -2,6 +2,7 @@ require "momo/stack.rb"
 
 module Momo
 	class CFL
+
 		def initialize(&block)
 			@stack = Stack.new(&block)
 		end

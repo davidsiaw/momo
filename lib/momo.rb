@@ -14,28 +14,10 @@ require 'momo/mapping'
 require 'momo/stack'
 
 
-def cfl(&block)
-	Momo::CFL.new(&block)
+module Momo
+
+	def self.cfl(&block)
+		Momo::CFL.new(&block)
+	end
+
 end
-
-def checkcfl(profile, region, template)
-
-	cf = Aws::CloudFormation::Client.new(
-		region: region, 
-		profile: profile)
-
-	cf.validate_template(template_body: template)
-end
-
-def runcfl(profile, region, name, template)
-
-	cf = Aws::CloudFormation::Client.new(
-		region: region, 
-		profile: profile)
-
-	cf.create_stack(
-		stack_name: name,
-		template_body: template)
-end
-
-

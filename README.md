@@ -27,7 +27,7 @@ Here's a basic way of using momo
 ```ruby
 require 'momo'
 
-template = cfl do
+template = Momo::cfl do
 	# Make a VPC
 	vpc = make "AWS::EC2::VPC" do
 		CidrBlock "10.0.0.0/16"
