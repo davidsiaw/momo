@@ -78,13 +78,7 @@ module Momo
 		end
 
 		def output(name, res)
-			if res.is_a? Resource
-				@outputs[name] = { "Ref" => res.name }
-			elsif res.is_a? String
-				@props[name] = res
-			else
-				raise "Invalid var: #{res}"
-			end
+			@outputs[name] = Momo.resolve(res)
 		end
 
 		def mapping(name, &block)
