@@ -1,10 +1,10 @@
 module Momo
 
 	class MemberReference < FuncCall
-		def initialize(resource_name, member_name)
+		def initialize(resource_name, member_name, stack)
 			@resource = resource_name
 			@member = member_name
-			super("Fn::GetAtt", "#{resource_name}", "#{member_name}")
+			super("Fn::GetAtt", stack, "#{resource_name}", "#{member_name}")
 		end
 
 		def member

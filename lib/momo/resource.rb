@@ -27,7 +27,7 @@ module Momo
 			if !@complete
 				@props[name] = Momo.resolve(args[0], resource: name, stack: @stack)
 			else
-				MemberReference.new @name, name
+				MemberReference.new @name, name, @stack
 			end
 		end
 		
