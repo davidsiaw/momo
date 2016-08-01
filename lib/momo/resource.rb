@@ -2,16 +2,20 @@ module Momo
 
 	class Resource < MomoScope
 
-		attr_accessor :type, :name, :props, :metadata, :dependencies, :deletion_policy
+		include MomoCondition
 
-		def initialize(type, name)
+		attr_accessor :type, :name, :props, :metadata, :condition, :dependencies, :deletion_policy
+
+		def initialize(type, name, stack)
 			@type = type
 			@name = name
 			@metadata = nil
 			@props = {}
+			@condition = nil
 			@dependencies = []
 			@complete = false
 			@deletion_policy = nil
+			@stack = stack
 		end
 
 		def method_missing(name, *args, &block)
@@ -21,7 +25,7 @@ module Momo
 			end
 
 			if !@complete
-				@props[name] = Momo.resolve(args[0], resource: name)
+				@props[name] = Momo.resolve(args[0], resource: name, stack: @stack)
 			else
 				MemberReference.new @name, name
 			end
@@ -126,7 +130,7 @@ module Momo
 			info["group"] = options[:group] if options[:group]
 			info["mode"] = options[:mode] if options[:mode]
 			info["owner"] = options[:owner] if options[:owner]
-			info["context"] = Momo.resolve(options[:context]) if options[:context]
+			info["context"] = Momo.resolve(options[:context], stack: @stack, resource: name) if options[:context]
 
 			set_thing2("files", name, info)
 		end
@@ -156,6 +160,5 @@ module Momo
 				raise "Invalid argument to depends_on: #{resource[0]}"
 			end
 		end
-
 	end
 end

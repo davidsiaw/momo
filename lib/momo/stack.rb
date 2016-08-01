@@ -4,7 +4,7 @@ module Momo
 
 	class Stack < MomoScope
 
-		attr_accessor :resources, :parameters, :outputs
+		attr_accessor :resources, :parameters, :conditions, :outputs
 
 		def initialize(&block)
 			raise "Stack expects a block" unless block
@@ -14,6 +14,8 @@ module Momo
 			@parameters = {}
 			@outputs = {}
 			@mappings = {}
+			@conditions = {}
+			@stack = self
 
 			@names = {}
 
@@ -33,7 +35,7 @@ module Momo
 				@description
 			end
 		end
-
+ 
 		def make_default_resource_name (type)
 			match = /\:?\:?([a-zA-Z]+)$/.match(type)
 			name = match.captures[0]
@@ -49,18 +51,31 @@ module Momo
 
 		def make_random_string
 			id = ""
-			loop do 
+			loop do
 				o = [('A'..'Z'), ('0'..'9')].map { |i| i.to_a }.flatten
 				id = (1...20).map { o[rand(o.length)] }.join
 				break if !@ids.has_key?(id)
-			end 
+			end
 
 			@ids[id] = true
 			id
 		end
 
 		def param(name, options={})
-			@parameters[name] = Parameter.new(name, options)
+			@parameters[name] = Parameter.new(name, self, options)
+		end
+
+		def condition(cond_expr, &block)
+			Momo.resolve(cond_expr, stack: self, resource: cond_expr.signature)
+			previous_condition = @current_condition
+
+			if previous_condition
+				cond_expr = BooleanValue.new("Fn::And", self, {"Condition" => previous_condition}, {"Condition" => cond_expr.signature})
+				Momo.resolve(cond_expr, stack: self, resource: cond_expr.signature)
+			end
+			@current_condition = cond_expr.signature
+			instance_eval(&block)
+			@current_condition = previous_condition
 		end
 
 		def make(type, options = {}, &block)
@@ -68,7 +83,8 @@ module Momo
 			name = options[:name]
 			name = make_default_resource_name(type) if !name
 
-			resource = Resource.new(type, name)
+			resource = Resource.new(type, name, self)
+			resource.condition = @current_condition
 			resource.instance_eval(&block) if block
 			resource.complete!
 
@@ -78,7 +94,7 @@ module Momo
 		end
 
 		def output(name, res)
-			@outputs[name] = Momo.resolve(res)
+			@outputs[name] = Momo.resolve(res, stack: self)
 		end
 
 		def mapping(name, &block)
@@ -87,6 +103,10 @@ module Momo
 
 		def templatize_mappings
 			@mappings
+		end
+
+		def templatize_conditions
+			@conditions
 		end
 
 		def templatize_resources
@@ -99,6 +119,10 @@ module Momo
 
 				if res.metadata
 					temp[name]["Metadata"] = res.metadata
+				end
+
+				if res.condition
+					temp[name]["Condition"] = res.condition
 				end
 
 				if res.dependencies.length != 0

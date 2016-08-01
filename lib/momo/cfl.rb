@@ -14,6 +14,7 @@ module Momo
 
 			template["Mappings"] = @stack.templatize_mappings
 			template["Resources"] = @stack.templatize_resources
+			template["Conditions"] = @stack.templatize_conditions
 			template["Parameters"] = @stack.templatize_params if @stack.parameters.length > 0
 			template["Outputs"] = @stack.templatize_outputs if @stack.outputs.length > 0
 
