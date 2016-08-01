@@ -26,7 +26,6 @@ module Momo
 		elsif something.is_a? Reference
 			return something.representation
 		elsif something.is_a? BooleanValue
-			options[:stack].conditions[something.signature] = something.representation
 			return { "Condition" => something.signature }
 		elsif something.is_a? FuncCall
 			return something.representation
@@ -51,14 +50,37 @@ module Momo
 		end
 	end
 
+	module MomoCondition
+
+		def equals(another)
+			BooleanValue.new("Fn::Equals", @stack, self, another)
+		end
+
+		def and(another)
+			BooleanValue.new("Fn::And", @stack, self, another)
+		end
+
+		def or(another)
+			BooleanValue.new("Fn::Or", @stack, self, another)
+		end
+
+	end
+
 	class BooleanValue < FuncCall
+
+		include MomoCondition
 
 		def initialize(operator, stack, *args)
 			super(operator, stack, args)
+			stack.conditions[self.signature] = self.representation
 		end
 
 		def not()
 			BooleanValue.new("Fn::Not", @stack, self)
+		end
+
+		def either(val_true, val_false)
+			FuncCall.new("Fn::If", @stack, self.signature, val_true, val_false)
 		end
 
 		def signature_of(something)
@@ -79,22 +101,6 @@ module Momo
 		def signature()
 			match = /Fn::(?<name>[a-z]+)/i.match(@name)
 			"#{signature_of(@args[0])}#{match[:name]}#{signature_of(@args[1])}"
-		end
-
-	end
-
-	module MomoCondition
-
-		def equals(another)
-			BooleanValue.new("Fn::Equals", @stack, self, another)
-		end
-
-		def and(another)
-			BooleanValue.new("Fn::And", @stack, self, another)
-		end
-
-		def or(another)
-			BooleanValue.new("Fn::Or", @stack, self, another)
 		end
 
 	end
