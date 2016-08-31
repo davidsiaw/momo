@@ -32,7 +32,7 @@ module Momo
 		elsif something.is_a? Parameter
 			return { "Ref" => something.name }
 		else
-			raise "Invalid var: '#{something}' in #{options[:resource]}"
+			raise "Invalid var: #{something.inspect} in #{options[:resource]}"
 		end
 	end
 	

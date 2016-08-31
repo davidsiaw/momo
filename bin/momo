@@ -22,7 +22,7 @@ Options:
 	opt :region, "AWS region to run your template", short: "r", default: "ap-northeast-1"
 end
 
-template = cfl do
+template = Momo::cfl do
 	eval File.read(ARGV[0])
 end
 

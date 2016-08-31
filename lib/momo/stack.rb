@@ -37,7 +37,10 @@ module Momo
 		end
  
 		def make_default_resource_name (type)
-			match = /\:?\:?([a-zA-Z]+)$/.match(type)
+			match = /\:?\:?([a-zA-Z0-9]+)$/.match(type)
+			if match == nil
+				raise "Invalid resource name: #{type}"
+			end
 			name = match.captures[0]
 
 			if !@names[name]
