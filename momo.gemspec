@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Momo::VERSION
   spec.authors       = ["David Siaw"]
   spec.email         = ["david.siaw@mobingi.com"]
-  spec.summary       = %q{Mobingi Deployment System}
+  spec.summary       = %q{Momo template maker for AWS}
   spec.description   = %q{Deploys Cloud Servers}
   spec.homepage      = ""
   spec.license       = "MIT"

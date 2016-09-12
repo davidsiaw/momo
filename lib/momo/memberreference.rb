@@ -12,7 +12,7 @@ module Momo
 		end
 
 		def method_missing(name, *args, &block)
-			MemberReference.new(@resource, "#{@member}.#{name}")
+			MemberReference.new(@resource, "#{@member}.#{name}", @stack)
 		end
 	end
 
