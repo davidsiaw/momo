@@ -1,7 +1,7 @@
 require "momo/version"
 require 'aws-sdk-core'
 require 'yaml'
-require 'JSON'
+require 'json'
 
 require 'momo/cfl'
 require 'momo/reference'
