@@ -20,13 +20,18 @@ module Momo
 
 		def method_missing(name, *args, &block)
 
-			if /^[[:upper:]]/.match(name) == nil
-				raise "Invalid resource name: #{name}"
-			end
-
 			if !@complete
-				@props[name] = Momo.resolve(args[0], resource: name, stack: @stack)
+				if /^[[:upper:]]/.match(name) == nil
+					raise "Invalid property name: #{name}"
+				end
+				@props[name] = Momo.resolve(args[0], resource: name, stack: @stack, &block)
+
 			else
+				if /^[[:upper:]]/.match(name) == nil
+					raise "Invalid attribute name: #{name}"
+				end
+				# For get attributes when the resource is completed
+				# TODO: should instead instance eval with a different class
 				MemberReference.new @name, name, @stack
 			end
 		end

@@ -2,7 +2,23 @@ require "momo/funccall"
 
 module Momo
 
-	def Momo.resolve(something, options={})
+	class BlockHash
+		attr_accessor :props
+		def initialize(options, &block)
+			@options = options
+			@props = {}
+			instance_eval(&block)
+		end
+
+		def method_missing(name, *args, &block)
+			if /^[[:upper:]]/.match(name) == nil
+				raise "Invalid property name: #{name}"
+			end
+			@props[name] = Momo.resolve(args[0], @options, &block)
+		end
+	end
+
+	def Momo.resolve(something, options={}, &block)
 
 		if something.is_a? String or 
 			something.is_a? TrueClass or 
@@ -31,6 +47,8 @@ module Momo
 			return something.representation
 		elsif something.is_a? Parameter
 			return { "Ref" => something.name }
+		elsif something == nil && block
+			return result = BlockHash.new(options, &block).props
 		else
 			raise "Invalid var: #{something.inspect} in #{options[:resource]}"
 		end
