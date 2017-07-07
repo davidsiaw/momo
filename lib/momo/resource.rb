@@ -35,7 +35,7 @@ module Momo
 				MemberReference.new @name, name, @stack
 			end
 		end
-		
+
 		def set_deletion_policy(value)
 			@deletion_policy = value
 		end

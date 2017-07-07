@@ -14,6 +14,11 @@ module Momo
 		def method_missing(name, *args, &block)
 			MemberReference.new(@resource, "#{@member}.#{name}", @stack)
 		end
+
+		def [](index)
+			FuncCall.new("Fn::Select", @stack, index, self)
+		end
+		
 	end
 
 end
